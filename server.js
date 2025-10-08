@@ -5,25 +5,40 @@ const connectDB = require('./config/db');
 
 dotenv.config();
 const app = express();
+
+// Connect MongoDB
 connectDB();
+
+// Middleware
 app.use(express.json());
 
-// Allow both local and deployed frontend
+// ✅ Allow both local and deployed frontend
 const allowedOrigins = [
-  'http://localhost:3000',
-  'https://lumi-frontend.up.railway.app'
+  'http://localhost:3000', // local frontend
+  'https://lumi-frontend.up.railway.app' // deployed frontend (optional)
 ];
-app.use(cors({ origin: allowedOrigins, credentials: true }));
 
-// Routes
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
+
+// ✅ Routes
 app.use('/api/items', require('./routes/items'));
-app.get('/', (req, res) => res.send('Lumi API running'));
 
-// Dynamic port
+// ✅ Test route
+app.get('/', (req, res) => {
+  res.send('✅ Lumi API is running successfully!');
+});
+
+// ✅ Dynamic Port (important for Railway)
 const PORT = process.env.PORT || 5000;
 
-// 🟢 Updated log to show Railway URL
+// ✅ Listen and show correct URL
 app.listen(PORT, () => {
-  const baseURL = process.env.RAILWAY_URL || `http://localhost:${PORT}`;
-  console.log(`✅ Server running at: ${baseURL}`);
+  const railwayURL = process.env.RAILWAY_PUBLIC_DOMAIN
+    ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`
+    : `http://localhost:${PORT}`;
+    
+  console.log(`✅ Server running at: ${railwayURL}`);
 });
