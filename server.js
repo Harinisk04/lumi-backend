@@ -8,12 +8,22 @@ const app = express();
 connectDB();
 app.use(express.json());
 
-const allowedOrigins = ['http://localhost:3000'];
+// Allow both local and deployed frontend
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://lumi-frontend.up.railway.app'
+];
 app.use(cors({ origin: allowedOrigins, credentials: true }));
 
+// Routes
 app.use('/api/items', require('./routes/items'));
 app.get('/', (req, res) => res.send('Lumi API running'));
 
-const PORT = process.env.PORT || 8080;
+// Dynamic port
+const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// 🟢 Updated log to show Railway URL
+app.listen(PORT, () => {
+  const baseURL = process.env.RAILWAY_URL || `http://localhost:${PORT}`;
+  console.log(`✅ Server running at: ${baseURL}`);
+});
